@@ -1,0 +1,75 @@
+keywords:
+  - repeated low-level red light
+  - RLRL
+  - red light therapy
+  - photobiomodulation
+  - PBM
+  - myopia
+  - myopia control
+  - pediatric myopia
+  - ophthalmology clinical trial
+  - retinal disease
+
+sources:
+  pubmed:
+    enabled: true
+    max_results_per_keyword: 5
+  europe_pmc:
+    enabled: true
+    max_results_per_keyword: 5
+  crossref:
+    enabled: true
+    max_results_per_keyword: 5
+
+  who_news_rss:
+    enabled: true
+    url: https://www.who.int/feeds/entity/news-english.xml
+  fda_news_rss:
+    enabled: true
+    url: https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/medwatch-safety-alerts-rss-feed.xml
+  ema_news_rss:
+    enabled: true
+    url: https://www.ema.europa.eu/en/news-events/news/rss.xml
+  nmpa_news_rss:
+    enabled: true
+    url: https://www.nmpa.gov.cn/datasearch/search-result.html?type=zyfb
+  aao_news_rss:
+    enabled: true
+    url: https://www.aao.org/rss/news
+  myopia_profile_rss:
+    enabled: true
+    url: https://www.myopiaprofile.com/feed/
+
+quality:
+  trusted_domains:
+    - pubmed.ncbi.nlm.nih.gov
+    - eutils.ncbi.nlm.nih.gov
+    - europepmc.org
+    - ebi.ac.uk
+    - api.crossref.org
+    - doi.org
+    - who.int
+    - fda.gov
+    - ema.europa.eu
+    - nmpa.gov.cn
+    - aao.org
+    - myopiaprofile.com
+    - nature.com
+    - jamanetwork.com
+    - aaojournal.org
+  title_similarity_threshold: 0.92
+
+output:
+  directory: ./data/ophthalmology_briefs
+  filename_prefix: ophthalmology_intelligence_brief
+  language: zh
+
+schedule:
+  frequency: manual # manual / daily / weekly
+  time_utc: "08:00"
+  weekday: monday
+
+google_drive:
+  enabled: false
+  service_account_file: ""
+  folder_id: ""
