@@ -190,6 +190,119 @@ cp env.example .env
 # 编辑 .env 文件，填入API密钥等配置
 ```
 
+### Windows（PowerShell）优先使用 Docker 安装（推荐）
+
+```powershell
+# 1) 克隆项目
+git clone https://github.com/zhouxiaoka/autoclip.git
+cd .\autoclip
+
+# 2) 检查 Docker / Docker Compose 是否可用
+docker --version
+docker compose version
+docker info
+
+# 3) 如果未安装 Docker Desktop（仅首次）
+winget install -e --id Docker.DockerDesktop
+# 安装后请手动启动 Docker Desktop，等待状态变成 "Engine running"
+
+# 4) 验证 Docker 正常
+docker run --rm hello-world
+
+# 5) 启动 AutoClip（生产模式）
+# 注意：必须在包含 docker-compose.yml 的项目根目录执行
+# 例如：D:\autoclip
+docker compose up -d
+
+# 6) 查看服务状态与日志
+docker compose ps
+docker compose logs -f
+```
+
+常见报错处理：
+
+- 报错 `no configuration file provided: not found`：
+  - 你当前目录没有 `docker-compose.yml`，先执行 `cd autoclip`（或切换到你实际的项目目录）。
+  - 用 `dir docker-compose.yml` 确认文件存在后再执行 `docker compose up -d`。
+  - 或者显式指定文件：`docker compose -f D:\autoclip\docker-compose.yml up -d`。
+- 报错 `cd : 找不到路径`：
+  - 说明你输入的目录不存在，不要固定使用 `D:\autoclip`。
+  - 回到你执行 `git clone` 的父目录，再执行 `cd .\autoclip`。
+  - 不确定仓库在哪时，先执行：`Get-ChildItem -Path D:\ -Directory -Recurse -Filter autoclip -ErrorAction SilentlyContinue` 查找目录。
+- 报错 `fatal: unable to access ... github.com ... Could not connect to server`：
+  - 这是网络连通性问题，不是项目代码错误。
+  - 先测试连通性：`Test-NetConnection github.com -Port 443`。
+  - 如果公司网络受限，请切换网络（如手机热点）或配置代理后再执行 `git pull`。
+  - 无法联网时可先在本地临时修复后构建：确保 `Dockerfile` 的入口是 `ENTRYPOINT ["./scripts/docker-entrypoint.sh"]`，并执行 `docker compose build --no-cache`。
+
+启动完成后，默认访问地址：
+
+- 前端：`http://localhost:3000`
+- 后端 API：`http://localhost:8000`
+
+如果你更偏向脚本方式，也可以使用：
+
+```bash
+./docker-start.sh
+./docker-status.sh
+./docker-stop.sh
+```
+
+### Windows（PowerShell）不使用 Docker 安装
+
+> 适用于无法访问 Docker Hub / GitHub 或不想使用 Docker 的场景。
+
+```powershell
+# 1) 安装基础依赖（仅首次）
+winget install -e --id Python.Python.3.11
+winget install -e --id OpenJS.NodeJS.LTS
+winget install -e --id Gyan.FFmpeg
+
+# Redis（二选一）
+# A. 直接安装 Redis for Windows（如 Memurai）
+# B. 使用 WSL 安装 redis-server
+
+# 2) 克隆并进入项目
+git clone https://github.com/zhouxiaoka/autoclip.git
+cd .\autoclip
+
+# 3) 安装 Python 依赖
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+# 4) 安装前端依赖
+cd .\frontend
+npm install
+cd ..
+
+# 5) 配置环境变量
+Copy-Item .\env.example .\.env
+# 手动编辑 .env，至少确认 REDIS_URL 与模型 API Key
+```
+
+分别开 3 个 PowerShell 窗口启动服务：
+
+```powershell
+# 窗口1：后端 API
+cd D:\你的路径\autoclip
+.\venv\Scripts\Activate.ps1
+python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+```powershell
+# 窗口2：Celery Worker
+cd D:\你的路径\autoclip
+.\venv\Scripts\Activate.ps1
+celery -A backend.core.celery_app worker --loglevel=info --concurrency=2
+```
+
+```powershell
+# 窗口3：前端
+cd D:\你的路径\autoclip\frontend
+npm run dev -- --host 0.0.0.0 --port 3000
+```
+
 ## 🎬 功能演示
 
 ### 主要功能展示

@@ -80,7 +80,6 @@ COPY backend/ ./backend/
 COPY scripts/ ./scripts/
 COPY *.sh ./
 COPY env.example .env
-COPY docker-entrypoint.sh ./
 
 # 创建必要的目录
 RUN mkdir -p data/projects data/uploads data/temp data/output logs
@@ -88,7 +87,7 @@ RUN mkdir -p data/projects data/uploads data/temp data/output logs
 # 设置权限
 RUN chown -R autoclip:autoclip /app
 RUN chmod +x *.sh
-RUN chmod +x docker-entrypoint.sh
+RUN chmod +x ./scripts/docker-entrypoint.sh
 RUN chmod -R 755 data logs
 
 # 切换到非root用户
@@ -102,5 +101,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/api/v1/health/ || exit 1
 
 # 启动命令
-ENTRYPOINT ["./docker-entrypoint.sh"]
+ENTRYPOINT ["./scripts/docker-entrypoint.sh"]
 CMD ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
